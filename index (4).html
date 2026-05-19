@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEVEL × Pinterest Pro</title>
+<style>
+:root{--red:#e60023;--red2:#ff4d6a;--rg:rgba(230,0,35,0.15);--bg:#0d0d0d;--bg2:#141414;--bg3:#1c1c1c;--br:rgba(255,255,255,0.08);--t:#fff;--t2:rgba(255,255,255,0.6);--t3:rgba(255,255,255,0.3);--g:#4ade80;--y:#fbbf24;--bl:#60a5fa;--r:12px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans','Segoe UI',sans-serif;min-height:100vh;}
+a{color:var(--red2);text-decoration:none;}
+
+.hdr{display:flex;align-items:center;gap:14px;padding:16px 24px;border-bottom:1px solid var(--br);position:sticky;top:0;background:rgba(13,13,13,.96);backdrop-filter:blur(16px);z-index:100;}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;flex-shrink:0;}
+.nav{display:flex;gap:2px;margin-left:auto;}
+.nav-btn{padding:7px 14px;border-radius:8px;border:none;background:transparent;color:var(--t3);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.nav-btn:hover{color:var(--t2);background:var(--bg3);}
+.nav-btn.active{background:var(--rg);color:var(--red2);}
+
+.page{display:none;padding:28px 24px;max-width:1200px;margin:0 auto;}
+.page.show{display:block;}
+.gen-layout{display:grid;grid-template-columns:1fr 360px;gap:24px;}
+@media(max-width:900px){.gen-layout{grid-template-columns:1fr;}}
+
+.card{background:var(--bg2);border:1px solid var(--br);border-radius:var(--r);padding:20px;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title span{font-size:16px;}
+
+.imp-tab{padding:8px 14px;border-radius:8px;border:1px solid var(--br);background:var(--bg3);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.imp-tab:hover{color:var(--t);}
+.imp-tab.active{background:var(--rg);border-color:rgba(230,0,35,.4);color:var(--red2);}
+
+.wb-inp{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--br);border-radius:9px;color:var(--t);font-size:13px;outline:none;font-family:inherit;resize:none;}
+.wb-inp:focus{border-color:rgba(230,0,35,.4);}
+.wb-go{padding:11px 18px;background:var(--red);border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.wb-go:hover{background:var(--red2);}
+.wb-go:disabled{background:var(--bg3);color:var(--t3);cursor:not-allowed;}
+
+.status{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:7px;display:none;}
+.status.ok{display:block;background:rgba(74,222,128,.08);color:var(--g);}
+.status.err{display:block;background:rgba(255,100,100,.08);color:#ff6b6b;}
+
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.full{grid-column:1/-1;}
+.fg label{display:block;font-size:10px;color:var(--t3);margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase;}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 13px;background:var(--bg3);border:1px solid var(--br);border-radius:8px;color:var(--t);font-size:13px;outline:none;font-family:inherit;resize:none;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:rgba(230,0,35,.35);}
+.fg select option{background:#1a1a1a;}
+
+.ftabs{display:flex;gap:6px;flex-wrap:wrap;}
+.ftab{padding:8px 14px;border-radius:8px;border:1px solid var(--br);background:var(--bg3);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.ftab:hover{border-color:rgba(230,0,35,.3);color:var(--t);}
+.ftab.active{background:linear-gradient(135deg,var(--red),var(--red2));border-color:transparent;color:#fff;}
+.fmt-desc{font-size:12px;color:var(--t3);margin-top:10px;padding:10px 14px;background:var(--bg3);border-radius:8px;line-height:1.6;}
+
+.tones{display:flex;gap:6px;flex-wrap:wrap;}
+.tn{padding:7px 13px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--t3);font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s;}
+.tn:hover{color:var(--t2);}
+.tn.active{background:var(--rg);border-color:rgba(230,0,35,.3);color:var(--red2);}
+
+.gbtn{width:100%;padding:14px;border-radius:var(--r);border:none;background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .3s;}
+.gbtn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(230,0,35,.3);}
+
+.preview-box{background:var(--bg2);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.preview-label{padding:14px 16px;font-size:11px;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--br);display:flex;justify-content:space-between;}
+.pinner{padding:16px;}
+.pcard{background:#fff;border-radius:10px;overflow:hidden;max-width:240px;margin:0 auto;}
+.pimg{background:linear-gradient(135deg,#f0ece8,#e5e0db);height:280px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.pimg img{width:100%;height:100%;object-fit:cover;position:absolute;}
+.pbadge{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;z-index:2;}
+.pprice{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.72);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:12px;z-index:2;display:none;}
+.pph{text-align:center;z-index:1;}
+.pph .ei{font-size:44px;}
+.pph p{font-size:12px;color:#999;margin-top:4px;}
+.pbody{padding:12px;}
+.ptitle{font-size:12px;font-weight:700;color:#111;line-height:1.4;margin-bottom:4px;min-height:16px;}
+.pdesc{font-size:11px;color:#666;line-height:1.5;min-height:14px;}
+.plink{font-size:10px;color:var(--red);margin-top:6px;}
+.pfmt{font-size:10px;background:#f5f5f5;color:#888;padding:2px 7px;border-radius:8px;display:inline-block;margin-top:5px;}
+
+.slabel{font-size:11px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:block;}
+.rb{background:var(--bg3);border:1px solid var(--br);border-radius:var(--r);padding:13px 16px;margin-bottom:9px;}
+.rbh{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.rbl{font-size:10px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;}
+.cpb{padding:4px 10px;background:rgba(255,255,255,.06);border:1px solid var(--br);border-radius:6px;color:var(--t2);font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s;}
+.cpb:hover{background:rgba(255,255,255,.12);color:var(--t);}
+.cpb.ok{background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.3);color:var(--g);}
+.rt{font-size:13px;color:rgba(255,255,255,.85);line-height:1.6;}
+.hook-big{font-size:20px;font-weight:900;letter-spacing:-.5px;}
+.cc{font-size:10px;color:var(--t3);text-align:right;margin-top:4px;}
+.cc.warn{color:var(--y);}
+.cc.over{color:#ff6b6b;}
+.tags-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.tag{font-size:11px;background:var(--rg);color:#ff8fa0;padding:3px 8px;border-radius:4px;}
+.slide-item{background:var(--bg2);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:11px 13px;margin-bottom:7px;}
+.snum{font-size:10px;color:var(--red2);font-weight:700;margin-bottom:4px;letter-spacing:.8px;}
+.stext{font-size:12px;color:rgba(255,255,255,.8);line-height:1.5;}
+.cpall{width:100%;padding:11px;border-radius:var(--r);border:1px solid var(--br);background:transparent;color:var(--t2);font-size:12px;cursor:pointer;font-family:inherit;margin-top:4px;}
+.cpall:hover{background:var(--bg3);color:var(--t);}
+
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:32px;}
+.guide-card{background:var(--bg2);border:1px solid var(--br);border-radius:var(--r);padding:20px;transition:border .2s;}
+.guide-card:hover{border-color:rgba(230,0,35,.2);}
+.gc-icon{font-size:28px;margin-bottom:12px;}
+.gc-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+.gc-text{font-size:13px;color:var(--t2);line-height:1.7;}
+.gc-tag{display:inline-block;font-size:10px;background:var(--rg);color:var(--red2);padding:2px 8px;border-radius:10px;margin-top:10px;}
+.section-head{font-size:20px;font-weight:700;margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--t2);margin-bottom:24px;line-height:1.6;}
+.divider{height:1px;background:var(--br);margin:32px 0;}
+.tip-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
+.tip{display:flex;gap:14px;background:var(--bg2);border:1px solid var(--br);border-radius:var(--r);padding:16px;}
+.tip-icon{font-size:22px;flex-shrink:0;}
+.tip-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.tip-text{font-size:12px;color:var(--t2);line-height:1.6;}
+.tip-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-top:6px;font-weight:600;}
+.tip-badge.must{background:rgba(230,0,35,.15);color:var(--red2);}
+.tip-badge.pro{background:rgba(96,165,250,.12);color:var(--bl);}
+.tip-badge.nice{background:rgba(74,222,128,.1);color:var(--g);}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--bg2);border:1px solid var(--br);border-radius:var(--r);padding:16px;}
+.stat-num{font-size:28px;font-weight:900;background:linear-gradient(135deg,var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
+.stat-label{font-size:12px;color:var(--t2);}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:24px;}
+@media(max-width:700px){.week-grid{grid-template-columns:repeat(4,1fr);}}
+.day-card{background:var(--bg2);border:1px solid var(--br);border-radius:var(--r);padding:14px 10px;text-align:center;}
+.day-name{font-size:10px;color:var(--t3);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;}
+.day-fmt{font-size:18px;margin-bottom:4px;}
+.day-label{font-size:11px;color:var(--t2);line-height:1.4;}
+.day-time{font-size:10px;color:var(--t3);margin-top:6px;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">L</div>
+  <div><div style="font-size:15px;font-weight:700;">LEVEL × Pinterest Pro</div><div style="font-size:11px;color:var(--t3);margin-top:1px;">Генератор пинов — работает без интернета</div></div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="goPage('gen',this)">✨ Генератор</button>
+    <button class="nav-btn" onclick="goPage('guide',this)">📖 Гайд</button>
+    <button class="nav-btn" onclick="goPage('strategy',this)">🎯 Стратегия</button>
+  </div>
+</div>
+
+<!-- GENERATOR -->
+<div class="page show" id="page-gen">
+  <div class="gen-layout">
+    <div>
+      <!-- WB IMPORT -->
+      <div class="card">
+        <div class="card-title"><span>🔗</span> Импорт с Wildberries</div>
+        <div style="display:flex;gap:6px;margin-bottom:14px;">
+          <button class="imp-tab active" onclick="setImpTab(this,'bm')">⚡ Букмарклет</button>
+          <button class="imp-tab" onclick="setImpTab(this,'manual')">✏️ Вручную</button>
+        </div>
+        <div id="imp-bm">
+          <div style="background:var(--bg3);border:1px solid var(--br);border-radius:9px;padding:14px;margin-bottom:12px;">
+            <div style="font-size:12px;color:var(--t2);line-height:1.7;">
+              <strong style="color:var(--red2);">1.</strong> Перетащи кнопку ↓ на панель закладок<br>
+              <strong style="color:var(--red2);">2.</strong> Открой товар на WB → жми закладку<br>
+              <strong style="color:var(--red2);">3.</strong> Вернись сюда → Ctrl+V в поле ниже
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg3);border:2px dashed rgba(230,0,35,.3);border-radius:9px;margin-bottom:12px;">
+            <a id="bookmarklet" href="#" style="background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;padding:10px 20px;border-radius:9px;font-size:13px;font-weight:700;cursor:grab;box-shadow:0 4px 16px rgba(230,0,35,.3);">🧦 LEVEL: Импорт</a>
+          </div>
+          <textarea class="wb-inp" id="pasteArea" rows="2" placeholder="Ctrl+V сюда после использования закладки..." oninput="onPaste()"></textarea>
+        </div>
+        <div id="imp-manual" style="display:none;">
+          <div style="font-size:12px;color:var(--t3);margin-bottom:10px;">Заполни поля товара вручную ниже 👇</div>
+        </div>
+        <div class="status" id="wbSt"></div>
+      </div>
+
+      <!-- FORMAT -->
+      <div class="card">
+        <div class="card-title"><span>🎨</span> Формат пина</div>
+        <div class="ftabs">
+          <button class="ftab active" onclick="setFmt(this,'standard')">📌 Стандартный</button>
+          <button class="ftab" onclick="setFmt(this,'carousel')">🎠 Карусель</button>
+          <button class="ftab" onclick="setFmt(this,'idea')">💡 Идея-пин</button>
+          <button class="ftab" onclick="setFmt(this,'video')">🎬 Видео-пин</button>
+        </div>
+        <div class="fmt-desc" id="fmtDesc">📌 Один вертикальный образ 2:3. Идеален для товарных карточек.</div>
+      </div>
+
+      <!-- PRODUCT -->
+      <div class="card">
+        <div class="card-title"><span>📦</span> Данные товара</div>
+        <div class="fgrid">
+          <div class="fg full"><label>Название товара *</label><input id="fn" placeholder="Носки женские в горошек набор 5 пар" oninput="updPrev()"></div>
+          <div class="fg"><label>Цена (₽)</label><input id="fp" placeholder="335" oninput="updPrev()"></div>
+          <div class="fg"><label>Старая цена (₽)</label><input id="fop" placeholder="760"></div>
+          <div class="fg"><label>Цвет</label><input id="fc" placeholder="Чёрный, серый, белый"></div>
+          <div class="fg"><label>Принт</label><input id="fpt" placeholder="Горошек"></div>
+          <div class="fg"><label>Сезон</label><select id="fs"><option>Всесезонные</option><option>Лето</option><option>Зима</option><option>Весна/Осень</option></select></div>
+          <div class="fg"><label>Рейтинг</label><input id="fr" placeholder="4.8 (249 отзывов)"></div>
+          <div class="fg full"><label>Фото (URL)</label><input id="fi" placeholder="https://..." oninput="updPrev()"></div>
+          <div class="fg full"><label>Ссылка WB</label><input id="fw" placeholder="https://wildberries.ru/catalog/..."></div>
+          <div class="fg full"><label>Доп. инфо</label><textarea id="fe" rows="2" placeholder="85% хлопок, 36-41, набор 5 пар..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- TONE -->
+      <div class="card">
+        <div class="card-title"><span>🎭</span> Тон</div>
+        <div class="tones">
+          <button class="tn active" onclick="setTn(this,'sell')">Продающий 🔥</button>
+          <button class="tn" onclick="setTn(this,'soft')">Нежный 🌸</button>
+          <button class="tn" onclick="setTn(this,'bold')">Дерзкий 😎</button>
+          <button class="tn" onclick="setTn(this,'fun')">Юмористический 😂</button>
+          <button class="tn" onclick="setTn(this,'min')">Минимализм 🤍</button>
+        </div>
+      </div>
+
+      <button class="gbtn" onclick="gen()">✨ Создать пин</button>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="preview-box">
+        <div class="preview-label"><span>Превью</span><span id="prevFmt" style="color:var(--red2);">📌 Стандартный</span></div>
+        <div class="pinner">
+          <div class="pcard">
+            <div class="pimg" id="pimg"><div class="pbadge">LEVEL</div><div class="pph"><div class="ei">🧦</div><p>Фото товара</p></div><div class="pprice" id="pprice"></div></div>
+            <div class="pbody"><div class="ptitle" id="ptitle">Заголовок появится после генерации</div><div class="pdesc" id="pdesc"></div><div class="plink">wildberries.ru</div><div class="pfmt" id="pfmt">Стандартный</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="results" style="display:none">
+        <span class="slabel">Готовый контент</span>
+        <div class="rb" id="rb-hook" style="display:none"><div class="rbh"><span class="rbl">🔥 Хук</span><button class="cpb" onclick="cp('r-hook',this)">📋</button></div><div class="hook-big" id="r-hook"></div></div>
+        <div class="rb" id="rb-title" style="display:none"><div class="rbh"><span class="rbl">📌 Заголовок</span><button class="cpb" onclick="cp('r-title',this)">📋</button></div><div class="rt" id="r-title"></div><div class="cc" id="cc-title"></div></div>
+        <div class="rb" id="rb-desc" style="display:none"><div class="rbh"><span class="rbl">📝 Описание</span><button class="cpb" onclick="cp('r-desc',this)">📋</button></div><div class="rt" id="r-desc"></div><div class="cc" id="cc-desc"></div></div>
+        <div class="rb" id="rb-slides" style="display:none"><div class="rbh"><span class="rbl" id="slides-label">🎠 Слайды</span><button class="cpb" onclick="cpSlides(this)">📋 Всё</button></div><div id="r-slides"></div></div>
+        <div class="rb" id="rb-cta" style="display:none"><div class="rbh"><span class="rbl">💬 CTA</span><button class="cpb" onclick="cp('r-cta',this)">📋</button></div><div class="rt" id="r-cta"></div></div>
+        <div class="rb" id="rb-board" style="display:none"><div class="rbh"><span class="rbl">📁 Доска</span><button class="cpb" onclick="cp('r-board',this)">📋</button></div><div class="rt" id="r-board"></div></div>
+        <div class="rb" id="rb-tags" style="display:none"><div class="rbh"><span class="rbl">🏷️ Хэштеги</span><button class="cpb" onclick="cpTags(this)">📋</button></div><div class="tags-row" id="r-tags"></div></div>
+        <button class="cpall" onclick="cpAll(this)">📋 Скопировать всё для Pinterest</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE -->
+<div class="page" id="page-guide">
+  <div class="section-head">📖 Гайд по Pinterest для LEVEL</div>
+  <div class="section-sub">Как получать тысячи просмотров и продажи носков с Pinterest → Wildberries</div>
+  <div class="guide-grid">
+    <div class="guide-card"><div class="gc-icon">🔍</div><div class="gc-title">Pinterest — поисковик, не соцсеть</div><div class="gc-text">85% пинов сохраняются от незнакомых аккаунтов. Контент живёт 6 месяцев — не 48 часов как в TikTok. Люди приходят с намерением купить.</div><div class="gc-tag">ВАЖНО</div></div>
+    <div class="guide-card"><div class="gc-icon">🛒</div><div class="gc-title">Pinterest → Wildberries</div><div class="gc-text">83% пользователей купили на основе пина. Ставь ссылку на товар WB в каждый пин. Это самый тёплый трафик из соцсетей.</div><div class="gc-tag">ДЕНЬГИ</div></div>
+    <div class="guide-card"><div class="gc-icon">📐</div><div class="gc-title">Формат 2:3 (1000×1500)</div><div class="gc-text">Вертикальные пины получают в 2-3 раза больше кликов. Никогда не публикуй горизонтальные фото — они теряются в ленте.</div><div class="gc-tag">ОБЯЗАТЕЛЬНО</div></div>
+    <div class="guide-card"><div class="gc-icon">🔑</div><div class="gc-title">SEO-заголовки</div><div class="gc-text">Pinterest индексирует заголовки. Пиши как люди ищут: "женские носки набор", "носки с принтом". Генератор делает это автоматически.</div><div class="gc-tag">SEO</div></div>
+    <div class="guide-card"><div class="gc-icon">📌</div><div class="gc-title">Создай 4 доски</div><div class="gc-text">"Носки LEVEL", "Подарки до 500₽", "Стильные образы с носками", "Тёплые носки". Разные доски = разные поисковые запросы.</div><div class="gc-tag">ДОСКИ</div></div>
+    <div class="guide-card"><div class="gc-icon">⏰</div><div class="gc-title">1 пин в день в 20:00</div><div class="gc-text">Алгоритм любит регулярность. Не публикуй 10 пинов сразу — равномерный постинг даёт больше охватов.</div><div class="gc-tag">ГРАФИК</div></div>
+  </div>
+  <div class="divider"></div>
+  <span class="slabel">Как пользоваться приложением</span>
+  <div class="guide-grid">
+    <div class="guide-card"><div class="gc-icon">1️⃣</div><div class="gc-title">Установи букмарклет</div><div class="gc-text">Перетащи кнопку "LEVEL: Импорт" на панель закладок. Один раз — навсегда.</div></div>
+    <div class="guide-card"><div class="gc-icon">2️⃣</div><div class="gc-title">Открой товар на WB</div><div class="gc-text">Жми закладку → данные скопируются. Вернись в приложение, нажми Ctrl+V в поле импорта.</div></div>
+    <div class="guide-card"><div class="gc-icon">3️⃣</div><div class="gc-title">Выбери формат и тон</div><div class="gc-text">Стандартный для обычных пинов, Карусель для набора, Идея-пин для вирусного контента, Видео-пин для максимум охватов.</div></div>
+    <div class="guide-card"><div class="gc-icon">4️⃣</div><div class="gc-title">Жми «Создать пин»</div><div class="gc-text">Копируй контент → открывай Pinterest → создавай пин → вставляй текст → публикуй. 2 минуты на пин.</div></div>
+  </div>
+</div>
+
+<!-- STRATEGY -->
+<div class="page" id="page-strategy">
+  <div class="section-head">🎯 Стратегия для LEVEL</div>
+  <div class="section-sub">Контент-план и воронка продаж Pinterest → Wildberries</div>
+  <span class="slabel">Потенциал</span>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-num">12M+</div><div class="stat-label">Пользователей в РФ</div></div>
+    <div class="stat-card"><div class="stat-num">83%</div><div class="stat-label">Купили по пину</div></div>
+    <div class="stat-card"><div class="stat-num">6 мес</div><div class="stat-label">Живёт пин</div></div>
+    <div class="stat-card"><div class="stat-num">0 ₽</div><div class="stat-label">Стоимость</div></div>
+  </div>
+  <div class="divider"></div>
+  <span class="slabel">Контент-план на неделю</span>
+  <div class="week-grid">
+    <div class="day-card"><div class="day-name">ПН</div><div class="day-fmt">📌</div><div class="day-label">Товарный</div><div class="day-time">20:00</div></div>
+    <div class="day-card"><div class="day-name">ВТ</div><div class="day-fmt">🎠</div><div class="day-label">Карусель</div><div class="day-time">20:00</div></div>
+    <div class="day-card"><div class="day-name">СР</div><div class="day-fmt">📌</div><div class="day-label">Другой товар</div><div class="day-time">20:00</div></div>
+    <div class="day-card"><div class="day-name">ЧТ</div><div class="day-fmt">💡</div><div class="day-label">Идея-пин</div><div class="day-time">20:00</div></div>
+    <div class="day-card"><div class="day-name">ПТ</div><div class="day-fmt">📌</div><div class="day-label">Подарочный</div><div class="day-time">20:00</div></div>
+    <div class="day-card"><div class="day-name">СБ</div><div class="day-fmt">🎬</div><div class="day-label">Видео</div><div class="day-time">12:00</div></div>
+    <div class="day-card"><div class="day-name">ВС</div><div class="day-fmt">🎠</div><div class="day-label">Образы</div><div class="day-time">15:00</div></div>
+  </div>
+  <div class="divider"></div>
+  <span class="slabel">Фазы роста</span>
+  <div class="tip-list">
+    <div class="tip"><div class="tip-icon">🌱</div><div><div class="tip-title">Месяц 1-2: Посев</div><div class="tip-text">1 пин/день, 4 доски, заполни профиль. Цель — 60 пинов. Охватов мало — нормально.</div><div class="tip-badge nice">СТАРТ</div></div></div>
+    <div class="tip"><div class="tip-icon">🚀</div><div><div class="tip-title">Месяц 3-4: Рост</div><div class="tip-text">Первые переходы на WB. 2 пина/день. Добавь видео-пины — алгоритм их продвигает.</div><div class="tip-badge pro">РОСТ</div></div></div>
+    <div class="tip"><div class="tip-icon">💰</div><div><div class="tip-title">Месяц 5+: Профит</div><div class="tip-text">Стабильный трафик на WB. Переиздавай топ-пины в новых форматах.</div><div class="tip-badge must">ПРОФИТ</div></div></div>
+  </div>
+</div>
+
+<script>
+// ======== STATE ========
+let tone='sell',fmt='standard',tagsText='',slidesRaw=[];
+const R=a=>a[Math.floor(Math.random()*a.length)]; // random pick
+
+// ======== BOOKMARKLET ========
+const BM_CODE=`(function(){try{var m=location.pathname.match(/catalog\\\\/(\\\\d+)/);if(!m){alert('Открой товар на WB!');return;}var id=m[1],n=parseInt(id),vol=Math.floor(n/100000),part=Math.floor(n/1000);function gb(i){if(i<=143)return 1;if(i<=287)return 2;if(i<=431)return 3;if(i<=719)return 4;if(i<=1007)return 5;if(i<=1061)return 6;if(i<=1115)return 7;if(i<=1169)return 8;if(i<=1313)return 9;if(i<=1601)return 10;if(i<=1655)return 11;if(i<=1919)return 12;if(i<=2045)return 13;if(i<=2189)return 14;if(i<=2405)return 15;if(i<=2621)return 16;if(i<=2837)return 17;return 18;}var bsk=String(gb(n)).padStart(2,'0');var img='https://basket-'+bsk+'.wbbasket.ru/vol'+vol+'/part'+part+'/'+id+'/images/big/1.webp';var d={name:'',price:'',oldPrice:'',rating:'',feedbacks:'',color:'',image:img,url:location.href,id:id};var h1=document.querySelector('h1');if(h1)d.name=h1.textContent.trim();if(!d.name||d.name.indexOf('Wildberries')>-1)d.name='';var all=document.querySelectorAll('[class*=price]');var pp=[];for(var j=0;j<all.length;j++){var nums=all[j].textContent.replace(/\\\\s/g,'').match(/([0-9]+)/g);if(nums)for(var k=0;k<nums.length;k++){var v=parseInt(nums[k]);if(v>10&&v<100000)pp.push(v);}}pp=[...new Set(pp)].sort(function(a,b){return a-b;});if(pp.length>=2){d.price=String(pp[0]);d.oldPrice=String(pp[pp.length-1]);}else if(pp.length===1)d.price=String(pp[0]);var rSel=['.product-review__rating','[itemprop=ratingValue]'];for(var l=0;l<rSel.length;l++){var rt=document.querySelector(rSel[l]);if(rt){var rv=rt.textContent.match(/([0-9][.,][0-9])/);if(rv){d.rating=rv[1].replace(',','.');break;}}}var ta=document.createElement('textarea');ta.value='LEVEL_WB::'+JSON.stringify(d);document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('✅ Скопировано!\\\\n'+d.name.slice(0,50)+'\\\\n'+(d.price?d.price+' руб':'')+'\\\\n\\\\nЖми Ctrl+V в приложении');}catch(e){alert('Ошибка: '+e.message);}})();`;
+document.getElementById('bookmarklet').href='javascript:'+encodeURIComponent(BM_CODE);
+
+// ======== CONTENT TEMPLATES ========
+const T={
+  hooks:{
+    sell:['СКИДКА {disc}%','НАБОР ЗА {price}₽','ТОП ПРОДАЖ','ЗАБИРАЙ ПОКА ЕСТЬ','ЦЕНА ОГОНЬ','ХВАТАЙ СКИДКУ','УСПЕЙ КУПИТЬ','БЕСТСЕЛЛЕР WB'],
+    soft:['НЕЖНОСТЬ','МЯГКОСТЬ','КОМФОРТ','УЮТНЫЕ','ЛЮБИМЫЕ','ДЛЯ ТЕБЯ','ЗАБОТА'],
+    bold:['ЛУЧШЕ НЕТ','ЗАЦЕНИ','ОГО ЦЕНА','БОМБА','FIRE','ТОПЧИК','КАЧЕСТВО 100%'],
+    fun:['НОСКИ МЕЧТЫ','ПРОЩАЙ ДЫРКИ','БЕРИ НЕ ДУМАЙ','НОГИ СКАЖУТ СПАСИБО','ШОК ЦЕНА'],
+    min:['LEVEL','СТИЛЬ','ПРОСТОТА','КЛАССИКА','КАЧЕСТВО','ВЫБОР']
+  },
+  titles:[
+    '{name} — {adj} {benefit}, {price_text} на Wildberries',
+    '{name} LEVEL — {adj}, {benefit}. {price_text}',
+    '{adj} {name} от LEVEL — {benefit} на Wildberries',
+    '{name}: {benefit}. Бренд LEVEL, {price_text} на WB',
+    'Купить {name} LEVEL — {adj}, {benefit}. {price_text}'
+  ],
+  adjs:{
+    sell:['топовые','хитовые','бестселлер','выгодные'],
+    soft:['нежные','мягкие','уютные','приятные к телу'],
+    bold:['стильные','дерзкие','яркие','крутые'],
+    fun:['классные','огненные','бомбические','улётные'],
+    min:['качественные','лаконичные','базовые','универсальные']
+  },
+  benefits:['не рвутся','натуральный хлопок','отличное качество','мягкие и удобные','держат форму','не скатываются','на каждый день','приятные к телу','дышащий материал','идеальная посадка'],
+  descs:{
+    sell:[
+      'Ищешь {adj} носки которые не разочаруют? {name} от LEVEL — это {benefit1} и {benefit2}. {rating_text} {price_text}. Заказывай на Wildberries — ссылка в профиле!',
+      '{name} LEVEL — {benefit1}, {benefit2}. {extra_text} {rating_text} {price_text} — заказывай на WB пока есть!',
+      'Наконец-то носки, которые {benefit1}! {name} от LEVEL. {benefit2}. {extra_text} {price_text}. Ссылка на Wildberries в профиле 👇'
+    ],
+    soft:[
+      'Подари своим ножкам комфорт 🤍 {name} от LEVEL — {benefit1} и {benefit2}. {extra_text} {price_text}. Ищи на Wildberries!',
+      '{adj} {name} LEVEL — для тех, кто ценит {benefit1}. {benefit2}. {rating_text} Ссылка на WB в профиле 🌸'
+    ],
+    bold:[
+      '{name} LEVEL — {benefit1}, {benefit2}. Качество которое чувствуешь. {price_text}. Бери на Wildberries, потом скажешь спасибо 🔥',
+      'Хватит носить ерунду! {name} от LEVEL — {benefit1}. {extra_text} {price_text}. WB, ссылка в профиле!'
+    ],
+    fun:[
+      'Носки которые не рвутся — это вообще реально? 😱 Да! {name} от LEVEL — {benefit1}, {benefit2}. {price_text}. Беги на WB!',
+      'Твои ноги заслуживают лучшего! {name} LEVEL — {benefit1}. {extra_text} {price_text}. Ссылка на WB в профиле 😂'
+    ],
+    min:[
+      '{name} LEVEL. {benefit1}. {benefit2}. {price_text}. Wildberries.',
+      'LEVEL. {name}. {benefit1}, {benefit2}. {extra_text} {price_text}.'
+    ]
+  },
+  ctas:{
+    sell:['Заказывай на WB — ссылка в профиле 🔥','Бери пока есть скидка!','Жми ссылку → забирай на Wildberries'],
+    soft:['Ищи на Wildberries 🤍','Ссылка на WB в профиле','Подари себе комфорт — заказывай на WB'],
+    bold:['Бери не думай — ссылка в профиле','Wildberries, потом скажешь спасибо','Жми → WB → покупай'],
+    fun:['Беги на WB пока не разобрали 😂','Ссылка в профиле — ноги скажут спасибо','Жми → Wildberries → радуйся'],
+    min:['Wildberries. Ссылка в профиле.','LEVEL на WB.','Заказать → Wildberries']
+  },
+  boards:['Носки LEVEL','Стильные носки','Подарки до 500 рублей','Модные аксессуары','Яркие носки с принтом','Тёплые носки','Носки на Wildberries'],
+  baseTags:['носки','женскиеноски','мужскиеноски','LEVEL','wildberries','вайлдберриз','стильныеноски','носкикупить','носкинабор','модныеноски','носкисоскидкой','подарок','носкиспринтом','хлопок','качественныеноски']
+};
+
+// ======== GENERATOR ENGINE ========
+function gen(){
+  const name=document.getElementById('fn').value.trim();
+  if(!name){alert('Введи название товара!');return;}
+  const f={name,price:document.getElementById('fp').value,oldprice:document.getElementById('fop').value,color:document.getElementById('fc').value,pattern:document.getElementById('fpt').value,season:document.getElementById('fs').value,rating:document.getElementById('fr').value,extra:document.getElementById('fe').value};
+
+  const disc=f.oldprice&&f.price?Math.round((1-parseInt(f.price)/parseInt(f.oldprice))*100):0;
+  const priceText=f.price?(f.oldprice?f.price+' ₽ вместо '+f.oldprice+' ₽':f.price+' ₽'):'';
+  const ratingText=f.rating?'Рейтинг '+f.rating+' на WB.':'';
+  const extraText=f.extra?f.extra.split(/[.,;]/)[0].trim()+'.':'';
+  const adj=R(T.adjs[tone]);
+  const b1=R(T.benefits), b2=R(T.benefits.filter(x=>x!==b1));
+
+  function fill(tpl){return tpl.replace(/\{name\}/g,name).replace(/\{adj\}/g,adj).replace(/\{benefit\}/g,b1).replace(/\{benefit1\}/g,b1).replace(/\{benefit2\}/g,b2).replace(/\{price_text\}/g,priceText).replace(/\{price\}/g,f.price||'').replace(/\{disc\}/g,disc).replace(/\{rating_text\}/g,ratingText).replace(/\{extra_text\}/g,extraText);}
+
+  const hook=fill(R(T.hooks[tone]));
+  const title=fill(R(T.titles)).slice(0,100);
+  const desc=fill(R(T.descs[tone])).slice(0,500);
+  const cta=fill(R(T.ctas[tone]));
+  const board=R(T.boards);
+  
+  // Smart tags based on product
+  let tags=[...T.baseTags];
+  if(f.color)f.color.split(/[;,]/).forEach(c=>{c=c.trim().toLowerCase();if(c.length>1)tags.push(c+'носки');});
+  if(f.pattern)tags.push(f.pattern.toLowerCase()+'носки');
+  if(f.season&&f.season!=='Всесезонные')tags.push(f.season.toLowerCase()+'носки');
+  tags=[...new Set(tags)].slice(0,10);
+
+  // Render based on format
+  const result={hook,title,description:desc,cta,board,hashtags:tags};
+
+  if(fmt==='carousel'){
+    result.slides=[
+      {num:1,title:'Встречай — '+name,text:adj+' носки от LEVEL. '+b1+'.'},
+      {num:2,title:f.color?'Цвета: '+f.color:'Стильный дизайн',text:b2+'. '+(extraText||'Идеальная посадка.')},
+      {num:3,title:ratingText||'Проверенное качество',text:'Сотни довольных покупателей на Wildberries.'},
+      {num:4,title:'Заказывай на WB!',text:priceText?priceText+'. ':'' +'Ссылка в профиле — бери пока есть!'}
+    ];
+  }
+  if(fmt==='idea'){
+    result.idea_steps=[
+      '🧦 '+name+' от LEVEL — '+b1,
+      '✨ '+adj+' дизайн'+(f.color?' в цветах: '+f.color:''),
+      '💪 '+(extraText||b2),
+      '⭐ '+(ratingText||'Проверенное качество на WB'),
+      '🛒 '+(priceText?priceText+' на Wildberries':'Заказывай на Wildberries')
+    ];
+  }
+  if(fmt==='video'){
+    result.script=[
+      {sec:'0-2с',action:'Крупный план носков на столе',text:hook},
+      {sec:'2-5с',action:'Рука берёт носки, показывает качество',text:name+' от LEVEL'},
+      {sec:'5-9с',action:'Надевает, показывает посадку',text:b1+'. '+b2},
+      {sec:'9-12с',action:'Логотип LEVEL + цена',text:(priceText||'')+'Ссылка в описании'}
+    ];
+  }
+
+  renderRes(result);
+}
+
+function renderRes(p){
+  ['rb-hook','rb-title','rb-desc','rb-slides','rb-cta','rb-board','rb-tags'].forEach(id=>document.getElementById(id).style.display='none');
+  if(p.hook){document.getElementById('r-hook').textContent=p.hook;document.getElementById('rb-hook').style.display='block';}
+  if(p.title){document.getElementById('r-title').textContent=p.title;document.getElementById('rb-title').style.display='block';const l=p.title.length;document.getElementById('cc-title').textContent=l+'/100';document.getElementById('cc-title').className='cc'+(l>100?' over':l>90?' warn':'');document.getElementById('ptitle').textContent=p.title;}
+  if(p.description){document.getElementById('r-desc').textContent=p.description;document.getElementById('rb-desc').style.display='block';const l=p.description.length;document.getElementById('cc-desc').textContent=l+'/500';document.getElementById('cc-desc').className='cc'+(l>500?' over':l>450?' warn':'');document.getElementById('pdesc').textContent=p.description.slice(0,70)+'...';}
+  const sEl=document.getElementById('r-slides');sEl.innerHTML='';slidesRaw=[];
+  if(p.slides){slidesRaw=p.slides;document.getElementById('slides-label').textContent='🎠 Слайды';p.slides.forEach(s=>{sEl.innerHTML+=`<div class="slide-item"><div class="snum">СЛАЙД ${s.num}</div><div class="stext"><strong>${s.title}</strong><br>${s.text}</div></div>`;});document.getElementById('rb-slides').style.display='block';}
+  if(p.idea_steps){slidesRaw=p.idea_steps;document.getElementById('slides-label').textContent='💡 Шаги';p.idea_steps.forEach((s,i)=>{sEl.innerHTML+=`<div class="slide-item"><div class="snum">ИДЕЯ ${i+1}</div><div class="stext">${s}</div></div>`;});document.getElementById('rb-slides').style.display='block';}
+  if(p.script){slidesRaw=p.script;document.getElementById('slides-label').textContent='🎬 Сценарий';p.script.forEach(s=>{sEl.innerHTML+=`<div class="slide-item"><div class="snum">${s.sec}</div><div class="stext"><strong>${s.action}</strong><br><em>${s.text}</em></div></div>`;});document.getElementById('rb-slides').style.display='block';}
+  if(p.cta){document.getElementById('r-cta').textContent=p.cta;document.getElementById('rb-cta').style.display='block';}
+  if(p.board){document.getElementById('r-board').textContent=p.board;document.getElementById('rb-board').style.display='block';}
+  if(p.hashtags){tagsText=p.hashtags.map(t=>'#'+t).join(' ');const tw=document.getElementById('r-tags');tw.innerHTML='';p.hashtags.forEach(t=>{tw.innerHTML+=`<span class="tag">#${t}</span>`;});document.getElementById('rb-tags').style.display='block';}
+  document.getElementById('results').style.display='block';
+}
+
+// ======== NAV ========
+function goPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+id).classList.add('show');btn.classList.add('active');}
+
+// ======== UI ========
+function setImpTab(btn,tab){document.querySelectorAll('.imp-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('imp-bm').style.display=tab==='bm'?'block':'none';document.getElementById('imp-manual').style.display=tab==='manual'?'block':'none';}
+const FMTS={standard:'📌 Один образ 2:3. Идеален для товарных карточек.',carousel:'🎠 4 слайда. Показывай цвета, детали, стиль.',idea:'💡 Обучающий формат. "5 образов с носками" — вирусный.',video:'🎬 Сценарий 8-12 сек. Максимум охватов.'};
+const FNAMES={standard:'📌 Стандартный',carousel:'🎠 Карусель',idea:'💡 Идея-пин',video:'🎬 Видео-пин'};
+function setFmt(btn,f){document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');fmt=f;document.getElementById('fmtDesc').textContent=FMTS[f];document.getElementById('pfmt').textContent=FNAMES[f];document.getElementById('prevFmt').textContent=FNAMES[f];}
+function setTn(btn,t){document.querySelectorAll('.tn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');tone=t;}
+
+function updPrev(){
+  const n=document.getElementById('fn').value,p=document.getElementById('fp').value,img=document.getElementById('fi').value;
+  if(n)document.getElementById('ptitle').textContent=n;
+  const pp=document.getElementById('pprice');
+  if(p){pp.textContent=p+' ₽';pp.style.display='block';}else pp.style.display='none';
+  const pi=document.getElementById('pimg');let ex=pi.querySelector('img');
+  if(img){if(!ex){ex=document.createElement('img');ex.onerror=()=>ex.remove();pi.appendChild(ex);}ex.src=img;}
+}
+
+function onPaste(){
+  const text=document.getElementById('pasteArea').value.trim();
+  if(!text.startsWith('LEVEL_WB::'))return;
+  try{
+    const d=JSON.parse(text.slice('LEVEL_WB::'.length));
+    if(d.name)document.getElementById('fn').value=d.name;
+    if(d.price)document.getElementById('fp').value=d.price;
+    if(d.oldPrice)document.getElementById('fop').value=d.oldPrice;
+    if(d.rating)document.getElementById('fr').value=d.rating+(d.feedbacks?' ('+d.feedbacks+' отзывов)':'');
+    if(d.url)document.getElementById('fw').value=d.url;
+    if(d.image)document.getElementById('fi').value=d.image;
+    if(d.color)document.getElementById('fc').value=d.color;
+    updPrev();
+    const st=document.getElementById('wbSt');
+    st.className='status ok';
+    st.textContent='✅ Загружено: '+(d.name||'').slice(0,50);
+    document.getElementById('pasteArea').value='';
+  }catch(e){}
+}
+
+// COPY
+function cp(id,btn){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{btn.textContent='✅';btn.classList.add('ok');setTimeout(()=>{btn.textContent='📋';btn.classList.remove('ok');},2000);});}
+function cpTags(btn){navigator.clipboard.writeText(tagsText).then(()=>{btn.textContent='✅';btn.classList.add('ok');setTimeout(()=>{btn.textContent='📋';btn.classList.remove('ok');},2000);});}
+function cpSlides(btn){const t=Array.isArray(slidesRaw)?slidesRaw.map((s,i)=>typeof s==='string'?`${i+1}. ${s}`:`${s.num||s.sec||i+1}. ${s.title||s.action||''}\n${s.text||''}`).join('\n\n'):'';navigator.clipboard.writeText(t).then(()=>{btn.textContent='✅';btn.classList.add('ok');setTimeout(()=>{btn.textContent='📋 Всё';btn.classList.remove('ok');},2000);});}
+function cpAll(btn){const parts=[document.getElementById('r-title').textContent,document.getElementById('r-desc').textContent,document.getElementById('r-cta').textContent,tagsText].filter(Boolean);navigator.clipboard.writeText(parts.join('\n\n')).then(()=>{btn.textContent='✅ Скопировано!';setTimeout(()=>{btn.textContent='📋 Скопировать всё';},2500);});}
+</script>
+</body>
+</html>
